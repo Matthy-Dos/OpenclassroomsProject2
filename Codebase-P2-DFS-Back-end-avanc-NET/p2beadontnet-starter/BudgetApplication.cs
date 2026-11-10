@@ -39,7 +39,8 @@ public sealed class BudgetApplication
                     SimulateCarPurchase(expenses);
                     break;
                 case 6:
-                    Console.WriteLine("Simulation prêt immobilier : à implémenter par l'étudiant.");
+                    Console.WriteLine("Simulation prêt immobilier : en cours d'implémentation.");
+                    SimulateMortgage(expenses);
                     break;
                 case 0:
                     running = false;
@@ -62,7 +63,7 @@ public sealed class BudgetApplication
         Console.WriteLine("3. Statistiques de base");
         Console.WriteLine("4. Statistiques complètes");
         Console.WriteLine("5. Simulation achat d'une voiture");
-        Console.WriteLine("6. Simulation prêt immobilier (à implémenter)");
+        Console.WriteLine("6. Simulation prêt immobilier (en cours d'implémentation)");
         Console.WriteLine("0. Quitter");
     }
 
@@ -159,9 +160,9 @@ public sealed class BudgetApplication
 
     private static void DisplayExpensesByCat(IReadOnlyCollection<Expense> expenses)
     {
-        var expensesbycat = ExpensesByCat(expenses);
+        var expensesbyCat = ExpensesByCat(expenses);
 
-        foreach (var expensebycat in expensesbycat.OrderBy(expensebycat => expensebycat.Key))
+        foreach (var expensebycat in expensesbyCat.OrderBy(expensebycat => expensebycat.Key))
         {
             Console.WriteLine($"{expensebycat.Key, -12}:{expensebycat.Value, 10:0.00} €");
         }
@@ -171,26 +172,27 @@ public sealed class BudgetApplication
     {
         string category = "";
         List<string> unicStrings = new();
-        Dictionary<string, decimal> expensesbycat = new();
+        Dictionary<string, decimal> expensesbyCat = new();
 
         foreach (var expense in expenses)
         {
             category = expense.Category;
             //Console.WriteLine($"Date : {expense.Date} - Date tronquée : {category}");
-            if (!expensesbycat.ContainsKey(category))
+            if (!expensesbyCat.ContainsKey(category))
             {
                 //Console.WriteLine($"Ajout de la catégorie : {category} avec le montant {expense.Amount} €");
-                expensesbycat.Add(category, expense.Amount);
-                //Console.WriteLine($"La catégorie {category} a été ajoutée avec le montant {expensesbycat[category]} €");
-            } else
+                expensesbyCat.Add(category, expense.Amount);
+                //Console.WriteLine($"La catégorie {category} a été ajoutée avec le montant {expensesbyCat[category]} €");
+            }
+            else
             {
-                //Console.WriteLine($"La catégorie : {category} contient {expensesbycat[category]} € et va recevoir le montant {expense.Amount} €");
-                expensesbycat[expense.Category] += expense.Amount;
-                //Console.WriteLine($"La catégorie : {category} contient maintenant {expensesbycat[category]} €");
+                //Console.WriteLine($"La catégorie : {category} contient {expensesbyCat[category]} € et va recevoir le montant {expense.Amount} €");
+                expensesbyCat[expense.Category] += expense.Amount;
+                //Console.WriteLine($"La catégorie : {category} contient maintenant {expensesbyCat[category]} €");
             }
         }
         
-        return expensesbycat;
+        return expensesbyCat;
     }
 
     private static void DisplayMonthlyAverageByCat(IReadOnlyCollection<Expense> expenses)
@@ -210,13 +212,73 @@ public sealed class BudgetApplication
 
     private static void SimulateCarPurchase(IReadOnlyCollection<Expense> expenses)
     {
-        decimal incomes = Input.ReadDecimal("Pour effectuer la simulation d'achat de véhihcule, veuillez renseigner vos revenus mensuels (€) : ");
+        decimal incomes = Input.ReadDecimal("Pour effectuer la simulation d'achat de véhihcule, veuillez renseigner vos revenus nets mensuels (€) : ");
         decimal price = Input.ReadDecimal("Quel est le prix d'achat du véhihcule (€) : ");
-        decimal monthlysavings = incomes - MonthlyAverage(expenses);
-        if (monthlysavings > 0)
+        decimal monthlySavings = incomes - MonthlyAverage(expenses);
+        if (monthlySavings > 0)
         {
             Console.WriteLine($"En tenant compte de dépenses mensuelles de {MonthlyAverage(expenses),0:0.00} €, " +
-                $"il faut compter {price / monthlysavings,0:0} mois pour financer le véhicule.");
+                $"il faut compter {price / monthlySavings,0:0} mois pour financer le véhicule.");
         } else { Console.WriteLine("Le projet ne peut pas être financé dans ces conditions."); }
+    }
+
+    private static void SimulateMortgage(IReadOnlyCollection<Expense> expenses)
+    {
+        if (expenses.Count == 0)
+        {
+            Console.WriteLine("Aucune statistique disponible. Calcul de simulation de prêt impossible");
+            return;
+        }
+
+        if (!FindExpenceCat(expenses, "housing"))
+        {
+            Console.WriteLine("Aucune dépense de logement disponible. Calcul de simulation de prêt impossible");
+            return;
+        }
+
+        decimal incomes = Input.ReadDecimal("Pour effectuer la simulation de prêt immobilier, veuillez renseigner vos revenus nets mensuels (€) : ");
+        decimal mortgageRate = Input.ReadDecimal("Quel est le taux annuel du crédit (%) : ");
+        decimal mortgageDuration = Input.ReadDecimal("Quelle est la durée du prêt en années : ");
+
+        if (mortgageDuration <= 0)
+        {
+            Console.WriteLine("Durée de prêt négative ou nulle, calcul de simulation de prêt impossible");
+            return;
+        }
+
+        decimal housingaverageExpenses = (ExpensesByCat(expenses))["housing"] / NbMonthExpenses(expenses);
+        decimal monthlyAverage = MonthlyAverage(expenses);
+        decimal monthlySavings = incomes - monthlyAverage;
+        decimal theomonthlyPaiement = monthlySavings + housingaverageExpenses;
+        decimal validmonthlyPaiement = Math.Min(theomonthlyPaiement, incomes * 0.35m);
+        
+        if (validmonthlyPaiement <= 0)
+        {
+            Console.WriteLine($"Capacité d'emprunt insuffisante, les dépenses ({monthlyAverage} €) sont supérieures aux revenus");
+            return;
+        }
+        Console.WriteLine($"Dépenses mensuelles :{monthlyAverage, 10:0.00} €");
+        Console.WriteLine($"Mensualités théoriques :{theomonthlyPaiement,10:0.00} €");
+        Console.WriteLine($"Mensualités retenues :{validmonthlyPaiement,10:0.00} €");
+
+        if (mortgageRate == 0)
+        {
+            Console.WriteLine($"La capacité d'emprunt est de {validmonthlyPaiement * mortgageDuration * 12} €");
+        } else
+        {
+            decimal n = mortgageDuration * 12;
+            decimal r = mortgageRate / 100 / 12;
+            Console.WriteLine($"La capacité d'emprunt est de {validmonthlyPaiement * ( 1 - (decimal)Math.Pow((double)(1m + r), (double)(-n))) / r, 0:0.00} €");
+        }
+
+    }
+
+    private static bool FindExpenceCat(IReadOnlyCollection<Expense> expenses, string category)
+    {
+        foreach (var expense in expenses)
+        {
+            if (expense.Category == category) { return true; }
+        }
+        return false;
     }
 }
