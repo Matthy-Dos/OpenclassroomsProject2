@@ -31,11 +31,12 @@ public sealed class BudgetApplication
                     DisplayBasicStatistics(expenses);
                     break;
                 case 4:
-                    Console.WriteLine("Statistiques complètes : en cours d'implémentation.");
+                    Console.WriteLine("Statistiques complètes");
                     DisplayDetailedStatistics(expenses);
                     break;
                 case 5:
-                    Console.WriteLine("Simulation voiture : à implémenter par l'étudiant.");
+                    Console.WriteLine("Simulation voiture");
+                    SimulateCarPurchase(expenses);
                     break;
                 case 6:
                     Console.WriteLine("Simulation prêt immobilier : à implémenter par l'étudiant.");
@@ -60,7 +61,7 @@ public sealed class BudgetApplication
         Console.WriteLine("2. Ajouter une dépense");
         Console.WriteLine("3. Statistiques de base");
         Console.WriteLine("4. Statistiques complètes");
-        Console.WriteLine("5. Simulation achat d'une voiture (à implémenter)");
+        Console.WriteLine("5. Simulation achat d'une voiture");
         Console.WriteLine("6. Simulation prêt immobilier (à implémenter)");
         Console.WriteLine("0. Quitter");
     }
@@ -205,5 +206,17 @@ public sealed class BudgetApplication
     private static decimal MonthlyAverage(IReadOnlyCollection<Expense> expenses)
     {
         return expenses.Sum(expense => expense.Amount) / NbMonthExpenses(expenses);
+    }
+
+    private static void SimulateCarPurchase(IReadOnlyCollection<Expense> expenses)
+    {
+        decimal incomes = Input.ReadDecimal("Pour effectuer la simulation d'achat de véhihcule, veuillez renseigner vos revenus mensuels (€) : ");
+        decimal price = Input.ReadDecimal("Quel est le prix d'achat du véhihcule (€) : ");
+        decimal monthlysavings = incomes - MonthlyAverage(expenses);
+        if (monthlysavings > 0)
+        {
+            Console.WriteLine($"En tenant compte de dépenses mensuelles de {MonthlyAverage(expenses),0:0.00} €, " +
+                $"il faut compter {price / monthlysavings,0:0} mois pour financer le véhicule.");
+        } else { Console.WriteLine("Le projet ne peut pas être financé dans ces conditions."); }
     }
 }
