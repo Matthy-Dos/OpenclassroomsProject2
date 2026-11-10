@@ -158,16 +158,10 @@ public sealed class BudgetApplication
     private static void DisplayExpensesByCat(IReadOnlyCollection<Expense> expenses)
     {
         var expensesbycat = ExpensesByCat(expenses);
-        string spaces = "          ";
-        int catmaxlength = 0;
-        if (expensesbycat.Count > 0) 
-        { 
-            catmaxlength = expensesbycat.Keys.Max(key => key.Length); 
-        }
-        
-        foreach (var expensebycat in expensesbycat)
+
+        foreach (var expensebycat in expensesbycat.OrderBy(expensebycat => expensebycat.Key))
         {
-            Console.WriteLine($"{expensebycat.Key}{spaces.Remove(0,spaces.Length + expensebycat.Key.Length - catmaxlength)} : {expensebycat.Value} €");
+            Console.WriteLine($"{expensebycat.Key, -12} : {expensebycat.Value, 10:0.00} €");
         }
     }
 
