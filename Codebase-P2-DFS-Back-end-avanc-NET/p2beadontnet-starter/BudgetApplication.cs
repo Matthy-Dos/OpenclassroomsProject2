@@ -134,10 +134,11 @@ public sealed class BudgetApplication
         //var total = expenses.Sum(expense => expense.Amount);
         Console.WriteLine($"Dépenses totales : {expenses.Sum(expense => expense.Amount)} €");
         Console.WriteLine($"Nombre de mois couverts par les dépenses : {NbMonthExpenses(expenses)}");
+        Console.WriteLine($"Dépenses totales par poste :"); DisplayExpensesByCat(expenses);
 
     }
 
-    private static int NbMonthExpenses (IReadOnlyCollection<Expense> expenses)
+    private static int NbMonthExpenses(IReadOnlyCollection<Expense> expenses)
     {
         string month = "";
         List<string> months = new();
@@ -149,8 +150,50 @@ public sealed class BudgetApplication
             {
                 //Console.WriteLine($"Mois unique compté : {month}");
                 months.Add(month);
-            } 
+            }
         }
         return months.Count;
+    }
+
+    private static void DisplayExpensesByCat(IReadOnlyCollection<Expense> expenses)
+    {
+        var expensesbycat = ExpensesByCat(expenses);
+        string spaces = "          ";
+        int catmaxlength = 0;
+        if (expensesbycat.Count > 0) 
+        { 
+            catmaxlength = expensesbycat.Keys.Max(key => key.Length); 
+        }
+        
+        foreach (var expensebycat in expensesbycat)
+        {
+            Console.WriteLine($"{expensebycat.Key}{spaces.Remove(0,spaces.Length + expensebycat.Key.Length - catmaxlength)} : {expensebycat.Value} €");
+        }
+    }
+
+    private static Dictionary<string, decimal> ExpensesByCat(IReadOnlyCollection<Expense> expenses)
+    {
+        string category = "";
+        List<string> unicStrings = new();
+        Dictionary<string, decimal> expensesbycat = new();
+
+        foreach (var expense in expenses)
+        {
+            category = expense.Category;
+            //Console.WriteLine($"Date : {expense.Date} - Date tronquée : {category}");
+            if (!expensesbycat.ContainsKey(category))
+            {
+                //Console.WriteLine($"Ajout de la catégorie : {category} avec le montant {expense.Amount} €");
+                expensesbycat.Add(category, expense.Amount);
+                //Console.WriteLine($"La catégorie {category} a été ajoutée avec le montant {expensesbycat[category]} €");
+            } else
+            {
+                //Console.WriteLine($"La catégorie : {category} contient {expensesbycat[category]} € et va recevoir le montant {expense.Amount} €");
+                expensesbycat[expense.Category] += expense.Amount;
+                //Console.WriteLine($"La catégorie : {category} contient maintenant {expensesbycat[category]} €");
+            }
+        }
+        
+        return expensesbycat;
     }
 }
