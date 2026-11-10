@@ -32,7 +32,7 @@ public sealed class BudgetApplication
                     break;
                 case 4:
                     Console.WriteLine("Statistiques complètes : en cours d'implémentation.");
-                    DisplayCompleteStatistics(expenses);
+                    DisplayDetailedStatistics(expenses);
                     break;
                 case 5:
                     Console.WriteLine("Simulation voiture : à implémenter par l'étudiant.");
@@ -59,7 +59,7 @@ public sealed class BudgetApplication
         Console.WriteLine("1. Afficher l'historique");
         Console.WriteLine("2. Ajouter une dépense");
         Console.WriteLine("3. Statistiques de base");
-        Console.WriteLine("4. Statistiques complètes (en cours d'implémentation)");
+        Console.WriteLine("4. Statistiques complètes");
         Console.WriteLine("5. Simulation achat d'une voiture (à implémenter)");
         Console.WriteLine("6. Simulation prêt immobilier (à implémenter)");
         Console.WriteLine("0. Quitter");
@@ -121,7 +121,7 @@ public sealed class BudgetApplication
         Console.WriteLine("Les statistiques détaillées sont à implémenter dans le cadre de l'exercice.");
     }
 
-    private static void DisplayCompleteStatistics(IReadOnlyCollection<Expense> expenses)
+    private static void DisplayDetailedStatistics(IReadOnlyCollection<Expense> expenses)
     {
         if (expenses.Count == 0)
         {
@@ -135,7 +135,8 @@ public sealed class BudgetApplication
         Console.WriteLine($"Dépenses totales : {expenses.Sum(expense => expense.Amount)} €");
         Console.WriteLine($"Nombre de mois couverts par les dépenses : {NbMonthExpenses(expenses)}");
         Console.WriteLine($"Dépenses totales par poste :"); DisplayExpensesByCat(expenses);
-
+        Console.WriteLine($"Dépenses moyennes mensuelles par poste :"); DisplayMonthlyAverageByCat(expenses);
+        Console.WriteLine($"Dépenses moyennes mensuelles : {MonthlyAverage(expenses), 0:0.00} €");
     }
 
     private static int NbMonthExpenses(IReadOnlyCollection<Expense> expenses)
@@ -161,7 +162,7 @@ public sealed class BudgetApplication
 
         foreach (var expensebycat in expensesbycat.OrderBy(expensebycat => expensebycat.Key))
         {
-            Console.WriteLine($"{expensebycat.Key, -12} : {expensebycat.Value, 10:0.00} €");
+            Console.WriteLine($"{expensebycat.Key, -12}:{expensebycat.Value, 10:0.00} €");
         }
     }
 
@@ -189,5 +190,20 @@ public sealed class BudgetApplication
         }
         
         return expensesbycat;
+    }
+
+    private static void DisplayMonthlyAverageByCat(IReadOnlyCollection<Expense> expenses)
+    {
+        int nbmontheExpenses = NbMonthExpenses(expenses);
+        foreach (var expensebycat in ExpensesByCat(expenses))
+        {
+            Console.WriteLine($"{expensebycat.Key, -12}:{expensebycat.Value / nbmontheExpenses, 10:0.00} €");
+        }
+
+    }
+
+    private static decimal MonthlyAverage(IReadOnlyCollection<Expense> expenses)
+    {
+        return expenses.Sum(expense => expense.Amount) / NbMonthExpenses(expenses);
     }
 }
