@@ -133,6 +133,24 @@ public sealed class BudgetApplication
         // Pour chaque Expense de la collection expenses, appelle-le temporairement expense et renvoie son Amount.
         //var total = expenses.Sum(expense => expense.Amount);
         Console.WriteLine($"Dépenses totales : {expenses.Sum(expense => expense.Amount)} €");
+        Console.WriteLine($"Nombre de mois couverts par les dépenses : {NbMonthExpenses(expenses)}");
 
+    }
+
+    private static int NbMonthExpenses (IReadOnlyCollection<Expense> expenses)
+    {
+        string month = "";
+        List<string> months = new();
+        foreach (var expense in expenses)
+        {
+            month = expense.Date.ToString().Remove(0, 3);
+            //Console.WriteLine($"Date : {expense.Date} - Date tronquée : {month}");
+            if (!months.Exists(element => element == month))
+            {
+                //Console.WriteLine($"Mois unique compté : {month}");
+                months.Add(month);
+            } 
+        }
+        return months.Count;
     }
 }
