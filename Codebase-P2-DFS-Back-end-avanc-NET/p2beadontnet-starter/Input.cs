@@ -24,6 +24,7 @@ public static class Input
         while (true)
         {
             Console.Write("Votre choix : ");
+            Console.WriteLine(" ");
             if (int.TryParse(Console.ReadLine(), out var choice))
             {
                 return choice;

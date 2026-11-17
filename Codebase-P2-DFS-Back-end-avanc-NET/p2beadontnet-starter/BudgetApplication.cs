@@ -22,24 +22,27 @@ public sealed class BudgetApplication
             switch (Input.ReadMenuChoice())
             {
                 case 1:
+                    Console.WriteLine("");
                     DisplayHistory(expenses);
                     break;
                 case 2:
+                    Console.WriteLine("");
                     AddExpense(expenses);
                     break;
                 case 3:
+                    Console.WriteLine("\nStatistiques basiques");
                     DisplayBasicStatistics(expenses);
                     break;
                 case 4:
-                    Console.WriteLine("Statistiques complètes");
+                    Console.WriteLine("\nStatistiques complètes");
                     DisplayDetailedStatistics(expenses);
                     break;
                 case 5:
-                    Console.WriteLine("Simulation voiture");
+                    Console.WriteLine("\nSimulation achat d'une voiture");
                     SimulateCarPurchase(expenses);
                     break;
                 case 6:
-                    Console.WriteLine("Simulation prêt immobilier : en cours d'implémentation.");
+                    Console.WriteLine("\nSimulation prêt immobilier");
                     SimulateMortgage(expenses);
                     break;
                 case 0:
@@ -63,7 +66,7 @@ public sealed class BudgetApplication
         Console.WriteLine("3. Statistiques de base");
         Console.WriteLine("4. Statistiques complètes");
         Console.WriteLine("5. Simulation achat d'une voiture");
-        Console.WriteLine("6. Simulation prêt immobilier (en cours d'implémentation)");
+        Console.WriteLine("6. Simulation prêt immobilier");
         Console.WriteLine("0. Quitter");
     }
 
@@ -198,7 +201,7 @@ public sealed class BudgetApplication
     private static void DisplayMonthlyAverageByCat(IReadOnlyCollection<Expense> expenses)
     {
         int nbmontheExpenses = NbMonthExpenses(expenses);
-        foreach (var expensebycat in ExpensesByCat(expenses))
+        foreach (var expensebycat in (ExpensesByCat(expenses)).OrderBy(expensebycat => expensebycat.Key))
         {
             Console.WriteLine($"{expensebycat.Key, -12}:{expensebycat.Value / nbmontheExpenses, 10:0.00} €");
         }
@@ -215,11 +218,17 @@ public sealed class BudgetApplication
         decimal incomes = Input.ReadDecimal("Pour effectuer la simulation d'achat de véhihcule, veuillez renseigner vos revenus nets mensuels (€) : ");
         decimal price = Input.ReadDecimal("Quel est le prix d'achat du véhihcule (€) : ");
         decimal monthlySavings = incomes - MonthlyAverage(expenses);
-        if (monthlySavings > 0)
+        /*if (monthlySavings > 0)
         {
             Console.WriteLine($"En tenant compte de dépenses mensuelles de {MonthlyAverage(expenses),0:0.00} €, " +
                 $"il faut compter {price / monthlySavings,0:0} mois pour financer le véhicule.");
         } else { Console.WriteLine("Le projet ne peut pas être financé dans ces conditions."); }
+        */
+        Console.WriteLine(
+            monthlySavings > 0 ? 
+                $"En tenant compte de dépenses mensuelles de {MonthlyAverage(expenses),0:0.00} €, " + $"il faut compter {price / monthlySavings,0:0} mois pour financer le véhicule." 
+                : "Le projet ne peut pas être financé dans ces conditions.");
+
     }
 
     private static void SimulateMortgage(IReadOnlyCollection<Expense> expenses)
@@ -230,9 +239,9 @@ public sealed class BudgetApplication
             return;
         }
 
-        if (!FindExpenceCat(expenses, "housing"))
+        if (!expenses.Any(expense => expense.Category == "housing"))
         {
-            Console.WriteLine("Aucune dépense de logement disponible. Calcul de simulation de prêt impossible");
+            Console.WriteLine("Aucune dépense de logement saisie. Calcul de simulation de prêt impossible");
             return;
         }
 
@@ -273,12 +282,4 @@ public sealed class BudgetApplication
 
     }
 
-    private static bool FindExpenceCat(IReadOnlyCollection<Expense> expenses, string category)
-    {
-        foreach (var expense in expenses)
-        {
-            if (expense.Category == category) { return true; }
-        }
-        return false;
-    }
 }

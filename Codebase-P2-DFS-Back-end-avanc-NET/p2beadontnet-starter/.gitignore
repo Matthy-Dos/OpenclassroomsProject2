@@ -1,2 +1,7 @@
 bin/
 obj/
+
+# Ignorer le dossier de dépendances
+.vs/
+
+# Ignorer un fichier précis
