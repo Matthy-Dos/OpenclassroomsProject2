@@ -5,3 +5,6 @@ obj/
 .vs/
 
 # Ignorer un fichier précis
+emma_expenses_empty.csv
+emma_expenses_good.csv
+emma_expenses_nolines.csv
