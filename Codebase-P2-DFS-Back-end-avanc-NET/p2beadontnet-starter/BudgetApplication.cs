@@ -215,6 +215,12 @@ public sealed class BudgetApplication
 
     private static void SimulateCarPurchase(IReadOnlyCollection<Expense> expenses)
     {
+        if (expenses.Count == 0)
+        {
+            Console.WriteLine("Aucune dépense disponible, simulation d'achat de voiture impossible.");
+            return;
+        }
+
         decimal incomes = Input.ReadDecimal("Pour effectuer la simulation d'achat de véhihcule, veuillez renseigner vos revenus nets mensuels (€) : ");
         decimal price = Input.ReadDecimal("Quel est le prix d'achat du véhihcule (€) : ");
         decimal monthlySavings = incomes - MonthlyAverage(expenses);
