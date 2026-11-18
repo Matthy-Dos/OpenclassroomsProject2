@@ -3,8 +3,6 @@ obj/
 
 # Ignorer le dossier de dépendances
 .vs/
+Data/
 
 # Ignorer un fichier précis
-emma_expenses_empty.csv
-emma_expenses_good.csv
-emma_expenses_nolines.csv
