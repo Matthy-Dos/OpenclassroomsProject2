@@ -3,5 +3,6 @@ obj/
 
 # Ignorer le dossier de dépendances
 .vs/
+Data/
 
 # Ignorer un fichier précis
