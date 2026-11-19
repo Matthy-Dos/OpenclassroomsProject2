@@ -137,81 +137,13 @@ public sealed class BudgetApplication
         // Utilise ici une lambda :
         // Pour chaque Expense de la collection expenses, appelle-le temporairement expense et renvoie son Amount.
         //var total = expenses.Sum(expense => expense.Amount);
-        Console.WriteLine($"Dépenses totales : {expenses.Sum(expense => expense.Amount)} €");
-        Console.WriteLine($"Nombre de mois couverts par les dépenses : {NbMonthExpenses(expenses)}");
-        Console.WriteLine($"Dépenses totales par poste :"); DisplayExpensesByCat(expenses);
-        Console.WriteLine($"Dépenses moyennes mensuelles par poste :"); DisplayMonthlyAverageByCat(expenses);
-        Console.WriteLine($"Dépenses moyennes mensuelles : {MonthlyAverage(expenses), 0:0.00} €");
+        Console.WriteLine($"Dépenses totales : {DetailedStatistics.CalculateTotalExpenses(expenses)} €");
+        Console.WriteLine($"Nombre de mois couverts par les dépenses : {DetailedStatistics.NbMonthExpenses(expenses)}");
+        Console.WriteLine($"Dépenses totales par poste :"); DetailedStatistics.DisplayExpensesByCat(expenses);
+        Console.WriteLine($"Dépenses moyennes mensuelles par poste :"); DetailedStatistics.DisplayMonthlyAverageByCat(expenses);
+        Console.WriteLine($"Dépenses moyennes mensuelles : {DetailedStatistics.MonthlyAverage(expenses), 0:0.00} €");
     }
 
-    private static int NbMonthExpenses(IReadOnlyCollection<Expense> expenses)
-    {
-        string month = "";
-        List<string> months = new();
-        foreach (var expense in expenses)
-        {
-            month = expense.Date.ToString().Remove(0, 3);
-            //Console.WriteLine($"Date : {expense.Date} - Date tronquée : {month}");
-            if (!months.Exists(element => element == month))
-            {
-                //Console.WriteLine($"Mois unique compté : {month}");
-                months.Add(month);
-            }
-        }
-        return months.Count;
-    }
-
-    private static void DisplayExpensesByCat(IReadOnlyCollection<Expense> expenses)
-    {
-        var expensesbyCat = ExpensesByCat(expenses);
-
-        foreach (var expensebycat in expensesbyCat.OrderBy(expensebycat => expensebycat.Key))
-        {
-            Console.WriteLine($"{expensebycat.Key, -12}:{expensebycat.Value, 10:0.00} €");
-        }
-    }
-
-    private static Dictionary<string, decimal> ExpensesByCat(IReadOnlyCollection<Expense> expenses)
-    {
-        string category = "";
-        List<string> unicStrings = new();
-        Dictionary<string, decimal> expensesbyCat = new();
-
-        foreach (var expense in expenses)
-        {
-            category = expense.Category;
-            //Console.WriteLine($"Date : {expense.Date} - Date tronquée : {category}");
-            if (!expensesbyCat.ContainsKey(category))
-            {
-                //Console.WriteLine($"Ajout de la catégorie : {category} avec le montant {expense.Amount} €");
-                expensesbyCat.Add(category, expense.Amount);
-                //Console.WriteLine($"La catégorie {category} a été ajoutée avec le montant {expensesbyCat[category]} €");
-            }
-            else
-            {
-                //Console.WriteLine($"La catégorie : {category} contient {expensesbyCat[category]} € et va recevoir le montant {expense.Amount} €");
-                expensesbyCat[expense.Category] += expense.Amount;
-                //Console.WriteLine($"La catégorie : {category} contient maintenant {expensesbyCat[category]} €");
-            }
-        }
-        
-        return expensesbyCat;
-    }
-
-    private static void DisplayMonthlyAverageByCat(IReadOnlyCollection<Expense> expenses)
-    {
-        int nbmontheExpenses = NbMonthExpenses(expenses);
-        foreach (var expensebycat in (ExpensesByCat(expenses)).OrderBy(expensebycat => expensebycat.Key))
-        {
-            Console.WriteLine($"{expensebycat.Key, -12}:{expensebycat.Value / nbmontheExpenses, 10:0.00} €");
-        }
-
-    }
-
-    private static decimal MonthlyAverage(IReadOnlyCollection<Expense> expenses)
-    {
-        return expenses.Sum(expense => expense.Amount) / NbMonthExpenses(expenses);
-    }
 
     private static void SimulateCarPurchase(IReadOnlyCollection<Expense> expenses)
     {
@@ -223,7 +155,7 @@ public sealed class BudgetApplication
 
         decimal incomes = Input.ReadDecimal("Pour effectuer la simulation d'achat de véhihcule, veuillez renseigner vos revenus nets mensuels (€) : ");
         decimal price = Input.ReadDecimal("Quel est le prix d'achat du véhihcule (€) : ");
-        decimal monthlySavings = incomes - MonthlyAverage(expenses);
+        decimal monthlySavings = incomes - DetailedStatistics.MonthlyAverage(expenses);
         /*if (monthlySavings > 0)
         {
             Console.WriteLine($"En tenant compte de dépenses mensuelles de {MonthlyAverage(expenses),0:0.00} €, " +
@@ -232,7 +164,7 @@ public sealed class BudgetApplication
         */
         Console.WriteLine(
             monthlySavings > 0 ? 
-                $"En tenant compte de dépenses mensuelles de {MonthlyAverage(expenses),0:0.00} €, " + $"il faut compter {price / monthlySavings,0:0} mois pour financer le véhicule." 
+                $"En tenant compte de dépenses mensuelles de {DetailedStatistics.MonthlyAverage(expenses),0:0.00} €, " + $"il faut compter {price / monthlySavings,0:0} mois pour financer le véhicule." 
                 : "Le projet ne peut pas être financé dans ces conditions.");
 
     }
@@ -261,8 +193,8 @@ public sealed class BudgetApplication
             return;
         }
 
-        decimal housingaverageExpenses = (ExpensesByCat(expenses))["housing"] / NbMonthExpenses(expenses);
-        decimal monthlyAverage = MonthlyAverage(expenses);
+        decimal housingaverageExpenses = (DetailedStatistics.ExpensesByCat(expenses))["housing"] / DetailedStatistics.NbMonthExpenses(expenses);
+        decimal monthlyAverage = DetailedStatistics.MonthlyAverage(expenses);
         decimal monthlySavings = incomes - monthlyAverage;
         decimal theomonthlyPaiement = monthlySavings + housingaverageExpenses;
         decimal validmonthlyPaiement = Math.Min(theomonthlyPaiement, incomes * 0.35m);
