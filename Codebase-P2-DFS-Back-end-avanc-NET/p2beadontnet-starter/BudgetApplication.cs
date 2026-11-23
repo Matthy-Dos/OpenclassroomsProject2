@@ -11,6 +11,9 @@ public sealed class BudgetApplication
 
     public void Run()
     {
+        //var autoChecks = new AutoChecks();
+        AutoChecks.Run();
+        
         var expenses = repository.Load();
         Console.WriteLine("=== Emma Budget ===");
         Console.WriteLine($"{expenses.Count} dépense(s) chargée(s).\n");

@@ -14,6 +14,7 @@ public static class DetailedStatistics
 
     public static int NbMonthExpenses(IReadOnlyCollection<Expense> expenses)
     {
+        if (expenses.Count() == 0) return 0;
         string month = "";
         List<string> months = new();
         foreach (var expense in expenses)
@@ -24,6 +25,7 @@ public static class DetailedStatistics
             {
                 //Console.WriteLine($"Mois unique compté : {month}");
                 months.Add(month);
+                //Console.WriteLine($"Nombre de mois : {months.Count}");
             }
         }
         return months.Count;
