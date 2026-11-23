@@ -70,14 +70,25 @@ public static class DetailedStatistics
         return expensesbyCat;
     }
 
-    public static void DisplayMonthlyAverageByCat(IReadOnlyCollection<Expense> expenses)
+    public static Dictionary<string, decimal> MonthlyAverageByCat(IReadOnlyCollection<Expense> expenses)
     {
-        int nbmontheExpenses = DetailedStatistics.NbMonthExpenses(expenses);
+        Dictionary<string, decimal> MonthlyAverageByCat = new();
+        decimal nbmontheExpenses = DetailedStatistics.NbMonthExpenses(expenses);
         foreach (var expensebycat in (DetailedStatistics.ExpensesByCat(expenses)).OrderBy(expensebycat => expensebycat.Key))
         {
-            Console.WriteLine($"{expensebycat.Key,-12}:{expensebycat.Value / nbmontheExpenses,10:0.00} €");
+            MonthlyAverageByCat.Add(expensebycat.Key, expensebycat.Value / nbmontheExpenses);
+            //Console.WriteLine($"{MonthlyAverageByCat[expensebycat.Key],-12}:{MonthlyAverageByCat[expensebycat.Key],10:0.00} €");
         }
 
+        return MonthlyAverageByCat;
+    }
+
+    public static void DisplayMonthlyAverageByCat(IReadOnlyCollection<Expense> expenses)
+    {
+        foreach (var expensebycat in (DetailedStatistics.MonthlyAverageByCat(expenses)))
+        {
+            Console.WriteLine($"{expensebycat.Key,-12}:{expensebycat.Value,10:0.00} €");
+        }
     }
 
 
