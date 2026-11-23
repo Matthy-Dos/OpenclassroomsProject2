@@ -101,16 +101,23 @@ public static class AutoTests
             DetailedStatistics.ExpensesByCat(notemptyExpenses)["food"] != 13.25m) { Console.WriteLine($"Erreur Test ExpensesByCat() with notemptyExpenses, résultats housing : {DetailedStatistics.ExpensesByCat(notemptyExpenses)["housing"]}, leisure : {DetailedStatistics.ExpensesByCat(notemptyExpenses)["leisure"]}, food : {DetailedStatistics.ExpensesByCat(notemptyExpenses)["food"]}"); }
 
 
-        // Test des moyennes mensuelles par catégories
+        // Test de la fonction MonthlyAverageByCat
         if (decimal.Round(DetailedStatistics.MonthlyAverageByCat(oneExpenses)["housing"],2) != 500m)
-                Console.WriteLine($"Erreur Test DisplayMonthlyAverageByCat with oneExpenses, résultat : {DetailedStatistics.MonthlyAverageByCat(oneExpenses)["housing"]}");
+                Console.WriteLine($"Erreur Test MonthlyAverageByCat with oneExpenses, résultat : {DetailedStatistics.MonthlyAverageByCat(oneExpenses)["housing"]}");
 
         if (decimal.Round(DetailedStatistics.MonthlyAverageByCat(notemptyExpenses)["housing"], 2) != 166.67m)
-            Console.WriteLine($"Erreur Test DisplayMonthlyAverageByCat with notemptyExpenses, résultat : {DetailedStatistics.MonthlyAverageByCat(notemptyExpenses)["housing"]}");
+            Console.WriteLine($"Erreur Test MonthlyAverageByCat with notemptyExpenses, résultat : {DetailedStatistics.MonthlyAverageByCat(notemptyExpenses)["housing"]}");
         if (decimal.Round(DetailedStatistics.MonthlyAverageByCat(notemptyExpenses)["leisure"], 2) != -8m)
-            Console.WriteLine($"Erreur Test DisplayMonthlyAverageByCat with notemptyExpenses, résultat : {DetailedStatistics.MonthlyAverageByCat(notemptyExpenses)["leisure"]}"); 
+            Console.WriteLine($"Erreur Test MonthlyAverageByCat with notemptyExpenses, résultat : {DetailedStatistics.MonthlyAverageByCat(notemptyExpenses)["leisure"]}"); 
         if (decimal.Round(DetailedStatistics.MonthlyAverageByCat(notemptyExpenses)["food"], 2) != 4.42m)
-            Console.WriteLine($"Erreur Test DisplayMonthlyAverageByCat with notemptyExpenses, résultat : {DetailedStatistics.MonthlyAverageByCat(notemptyExpenses)["food"]}");
+            Console.WriteLine($"Erreur Test MonthlyAverageByCat with notemptyExpenses, résultat : {DetailedStatistics.MonthlyAverageByCat(notemptyExpenses)["food"]}");
+
+
+        // Test de la fonction MonthlyAverage
+        if (decimal.Round(DetailedStatistics.MonthlyAverage(oneExpenses), 2) != 500.00m)
+            Console.WriteLine($"Erreur Test MonthlyAverage with oneExpenses, résultat : {DetailedStatistics.MonthlyAverage(oneExpenses)}");
+        if (decimal.Round(DetailedStatistics.MonthlyAverage(notemptyExpenses), 2) != 163.08m)
+            Console.WriteLine($"Erreur Test MonthlyAverage with notemptyExpenses, résultat : {DetailedStatistics.MonthlyAverage(notemptyExpenses)}");
     }
 
 }
