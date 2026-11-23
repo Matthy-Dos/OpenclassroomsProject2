@@ -12,7 +12,7 @@ public sealed class BudgetApplication
     public void Run()
     {
         //var autoChecks = new AutoChecks();
-        AutoChecks.Run();
+        AutoTests.Run();
         
         var expenses = repository.Load();
         Console.WriteLine("=== Emma Budget ===");

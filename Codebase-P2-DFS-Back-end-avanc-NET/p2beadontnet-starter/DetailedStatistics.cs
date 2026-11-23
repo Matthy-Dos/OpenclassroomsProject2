@@ -47,7 +47,9 @@ public static class DetailedStatistics
         List<string> unicStrings = new();
         Dictionary<string, decimal> expensesbyCat = new();
 
-        foreach (var expense in expenses)
+        //if (expenses.Count() == 0) return expensesbyCat;
+
+        foreach (var expense in expenses.OrderBy(expenses => expenses.Category))
         {
             category = expense.Category;
             //Console.WriteLine($"Date : {expense.Date} - Date tronquée : {category}");
