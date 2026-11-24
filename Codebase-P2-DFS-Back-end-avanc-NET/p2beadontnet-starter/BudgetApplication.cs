@@ -42,11 +42,11 @@ public sealed class BudgetApplication
                     break;
                 case 5:
                     Console.WriteLine("\nSimulation achat d'une voiture");
-                    SimulateCarPurchase(expenses);
+                    DisplayCarPurchaseSimulation(expenses);
                     break;
                 case 6:
                     Console.WriteLine("\nSimulation prêt immobilier");
-                    SimulateMortgage(expenses);
+                    DisplayMorgageSimulation(expenses);
                     break;
                 case 0:
                     running = false;
@@ -148,7 +148,7 @@ public sealed class BudgetApplication
     }
 
 
-    private static void SimulateCarPurchase(IReadOnlyCollection<Expense> expenses)
+    private static void DisplayCarPurchaseSimulation(IReadOnlyCollection<Expense> expenses)
     {
         if (expenses.Count == 0)
         {
@@ -156,27 +156,42 @@ public sealed class BudgetApplication
             return;
         }
 
-        decimal incomes = Input.ReadDecimal("Pour effectuer la simulation d'achat de véhihcule, veuillez renseigner vos revenus nets mensuels (€) : ");
-        decimal price = Input.ReadDecimal("Quel est le prix d'achat du véhihcule (€) : ");
-        decimal monthlySavings = incomes - DetailedStatistics.MonthlyAverage(expenses);
+        decimal incomes = Input.ReadPositiveDecimal("Pour effectuer la simulation d'achat de véhihcule, veuillez renseigner vos revenus nets mensuels (€) : ");
+        decimal price = Input.ReadPositiveDecimal("Quel est le prix d'achat du véhihcule (€) : ");
+        decimal? monthlyExpenses = DetailedStatistics.MonthlyAverage(expenses);
+        decimal? carSimulation = CalculateCarPurchaseSimulation(expenses, incomes, price);
+
+        
+        Console.WriteLine(
+            carSimulation > 0 ? 
+                $"En tenant compte de dépenses mensuelles de {monthlyExpenses,0:0.00} €, " + $"il faut compter {carSimulation,0:0} mois pour financer le véhicule." 
+                : "Le projet ne peut pas être financé dans ces conditions.");
+
+
         /*if (monthlySavings > 0)
         {
             Console.WriteLine($"En tenant compte de dépenses mensuelles de {MonthlyAverage(expenses),0:0.00} €, " +
                 $"il faut compter {price / monthlySavings,0:0} mois pour financer le véhicule.");
         } else { Console.WriteLine("Le projet ne peut pas être financé dans ces conditions."); }
         */
-        Console.WriteLine(
-            monthlySavings > 0 ? 
-                $"En tenant compte de dépenses mensuelles de {DetailedStatistics.MonthlyAverage(expenses),0:0.00} €, " + $"il faut compter {price / monthlySavings,0:0} mois pour financer le véhicule." 
-                : "Le projet ne peut pas être financé dans ces conditions.");
 
     }
 
-    private static void SimulateMortgage(IReadOnlyCollection<Expense> expenses)
+    public static decimal? CalculateCarPurchaseSimulation(IReadOnlyCollection<Expense> expenses, decimal incomes, decimal price)
+    {
+        decimal? monthlySavings = incomes - DetailedStatistics.MonthlyAverage(expenses);
+        if (monthlySavings > 0 && (monthlySavings is decimal Value))
+        {
+            return decimal.Round(price / Value, 0, MidpointRounding.ToPositiveInfinity); 
+        } 
+        return null;
+    }
+
+    private static void DisplayMorgageSimulation(IReadOnlyCollection<Expense> expenses)
     {
         if (expenses.Count == 0)
         {
-            Console.WriteLine("Aucune statistique disponible. Calcul de simulation de prêt impossible");
+            Console.WriteLine("Aucune dépense disponible. Calcul de simulation de prêt impossible");
             return;
         }
 
@@ -186,32 +201,36 @@ public sealed class BudgetApplication
             return;
         }
 
-        decimal incomes = Input.ReadDecimal("Pour effectuer la simulation de prêt immobilier, veuillez renseigner vos revenus nets mensuels (€) : ");
+        decimal incomes = Input.ReadPositiveDecimal("Pour effectuer la simulation de prêt immobilier, veuillez renseigner vos revenus nets mensuels (€) : ");
         decimal mortgageRate = Input.ReadDecimal("Quel est le taux annuel du crédit (%) : ");
-        decimal mortgageDuration = Input.ReadDecimal("Quelle est la durée du prêt en années : ");
+        decimal mortgageDuration = Input.ReadPositiveDecimal("Quelle est la durée du prêt en années : ");
 
-        if (mortgageDuration <= 0)
+
+        decimal housingaverageExpenses = (DetailedStatistics.ExpensesByCat(expenses))["housing"] / DetailedStatistics.NbMonthExpenses(expenses);
+        decimal? monthlyAverage = DetailedStatistics.MonthlyAverage(expenses);
+        if (monthlyAverage is not decimal) 
         {
-            Console.WriteLine("Durée de prêt négative ou nulle, calcul de simulation de prêt impossible");
+            Console.WriteLine($"Dépenses mensuelle impossibles à calculer, simulation de crédit impossible");
             return;
         }
 
-        decimal housingaverageExpenses = (DetailedStatistics.ExpensesByCat(expenses))["housing"] / DetailedStatistics.NbMonthExpenses(expenses);
-        decimal monthlyAverage = DetailedStatistics.MonthlyAverage(expenses);
-        decimal monthlySavings = incomes - monthlyAverage;
+        decimal monthlySavings = incomes - (decimal)monthlyAverage;
         decimal theomonthlyPaiement = monthlySavings + housingaverageExpenses;
         decimal validmonthlyPaiement = Math.Min(theomonthlyPaiement, incomes * 0.35m);
         
+        
+
         if (validmonthlyPaiement <= 0)
         {
             Console.WriteLine($"Capacité d'emprunt insuffisante, les dépenses ({monthlyAverage} €) sont supérieures aux revenus");
             return;
         }
-        Console.WriteLine($"Dépenses mensuelles :{monthlyAverage, 10:0.00} €");
-        Console.WriteLine($"Mensualités théoriques :{theomonthlyPaiement,10:0.00} €");
-        Console.WriteLine($"Mensualités retenues :{validmonthlyPaiement,10:0.00} €");
+        Console.WriteLine("\n{0,-35}: {1,10:0.00} €", "Dépenses mensuelles (loyer inclus)", monthlyAverage);
+        Console.WriteLine("{0,-35}: {1,10:0.00} €", "Dépenses mensuelles (hors loyer)", incomes - theomonthlyPaiement);
+        Console.WriteLine("{0,-35}: {1,10:0.00} €", "Mensualités théoriques", theomonthlyPaiement);
+        Console.WriteLine("{0,-35}: {1,10:0.00} €", "Mensualités retenues", validmonthlyPaiement);
 
-        if (mortgageRate == 0)
+        /*if (mortgageRate == 0)
         {
             Console.WriteLine($"La capacité d'emprunt est de {validmonthlyPaiement * mortgageDuration * 12} €");
         } else
@@ -219,8 +238,24 @@ public sealed class BudgetApplication
             decimal n = mortgageDuration * 12;
             decimal r = mortgageRate / 100 / 12;
             Console.WriteLine($"La capacité d'emprunt est de {validmonthlyPaiement * ( 1 - (decimal)Math.Pow((double)(1m + r), (double)(-n))) / r, 0:0.00} €");
-        }
+        }*/
 
+        Console.WriteLine($"\nLa capacité d'emprunt est de {CalculateMorgageSimulation(validmonthlyPaiement, mortgageDuration, mortgageRate), 0:0.00} €");
+
+    }
+
+    public static decimal CalculateMorgageSimulation (decimal validmonthlyPaiement, decimal mortgageDuration, decimal mortgageRate)
+    {
+        if (mortgageRate == 0)
+        {
+            return validmonthlyPaiement * mortgageDuration * 12;
+        }
+        else
+        {
+            decimal n = mortgageDuration * 12;
+            decimal r = mortgageRate / 100 / 12;
+            return validmonthlyPaiement * (1 - (decimal)Math.Pow((double)(1m + r), (double)(-n))) / r;
+        }
     }
 
 }

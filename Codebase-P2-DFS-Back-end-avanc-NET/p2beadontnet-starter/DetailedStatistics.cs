@@ -92,9 +92,11 @@ public static class DetailedStatistics
     }
 
 
-    public static decimal MonthlyAverage(IReadOnlyCollection<Expense> expenses)
+    public static decimal? MonthlyAverage(IReadOnlyCollection<Expense> expenses)
     {
-        return expenses.Sum(expense => expense.Amount) / DetailedStatistics.NbMonthExpenses(expenses);
+        decimal nbmonthExpenses = DetailedStatistics.NbMonthExpenses(expenses);
+        if (nbmonthExpenses != 0) return expenses.Sum(expense => expense.Amount) / nbmonthExpenses;
+        return null;
     }
 
 }

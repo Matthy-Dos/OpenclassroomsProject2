@@ -114,10 +114,25 @@ public static class AutoTests
 
 
         // Test de la fonction MonthlyAverage
-        if (decimal.Round(DetailedStatistics.MonthlyAverage(oneExpenses), 2) != 500.00m)
-            Console.WriteLine($"Erreur Test MonthlyAverage with oneExpenses, résultat : {DetailedStatistics.MonthlyAverage(oneExpenses)}");
-        if (decimal.Round(DetailedStatistics.MonthlyAverage(notemptyExpenses), 2) != 163.08m)
-            Console.WriteLine($"Erreur Test MonthlyAverage with notemptyExpenses, résultat : {DetailedStatistics.MonthlyAverage(notemptyExpenses)}");
+        decimal? nullableDecimal = DetailedStatistics.MonthlyAverage(oneExpenses);
+        if ( ((nullableDecimal is not decimal notnullableMonthlyAverageoneExpenses) 
+            ? null 
+            : decimal.Round(notnullableMonthlyAverageoneExpenses, 2)) != 500.00m)
+            Console.WriteLine($"Erreur Test MonthlyAverage with oneExpenses, résultat : {nullableDecimal}");
+        
+        nullableDecimal = DetailedStatistics.MonthlyAverage(notemptyExpenses);
+        if ( ((nullableDecimal is not decimal notnullableMonthlyAveragenotemptyExpenses) 
+            ? null
+            : decimal.Round(notnullableMonthlyAveragenotemptyExpenses, 2)) != 163.08m)
+            Console.WriteLine($"Erreur Test MonthlyAverage with notemptyExpenses, résultat : {nullableDecimal}");
+
+        
+        // Test de la fonction CalculateCarPurchaseSimulation
+        if (BudgetApplication.CalculateCarPurchaseSimulation(emptylistExpenses, 2000, 20000) is not decimal)
+            Console.WriteLine($"Erreur Test CalculateCarPurchaseSimulation with oneExpenses, résultat : {BudgetApplication.CalculateCarPurchaseSimulation(emptylistExpenses, 2000, 20000)}");
+
+        if (BudgetApplication.CalculateCarPurchaseSimulation(oneExpenses, 2000, 20000) != 14m)
+            Console.WriteLine($"Erreur Test CalculateCarPurchaseSimulation with oneExpenses, résultat : {BudgetApplication.CalculateCarPurchaseSimulation(oneExpenses, 2000, 20000)}");
     }
 
 }

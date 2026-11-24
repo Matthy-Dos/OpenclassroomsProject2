@@ -15,7 +15,7 @@ public static class Input
                 return value;
             }
 
-            Console.WriteLine("La valeur est obligatoire.");
+            Console.WriteLine("La valeur est obligatoire.\n");
         }
     }
 
@@ -30,7 +30,7 @@ public static class Input
                 return choice;
             }
 
-            Console.WriteLine("Choisissez un numéro valide.");
+            Console.WriteLine("Choisissez un numéro valide.\n");
         }
     }
 
@@ -44,7 +44,21 @@ public static class Input
                 return value;
             }
 
-            Console.WriteLine("Saisissez un nombre valide, par exemple 1234,56 ou 1234.56.");
+            Console.WriteLine("Saisissez un nombre valide, par exemple 1234,56 ou 1234.56.\n");
+        }
+    }
+
+    public static decimal ReadPositiveDecimal(string prompt)
+    {
+        while (true)
+        {
+            Console.Write(prompt);
+            if (TryParseDecimal(Console.ReadLine(), out var value) && value > 0)
+            {
+                return value;
+            }
+
+            Console.WriteLine("Saisissez un nombre valide et strictement positif, par exemple 1234,56 ou 1234.56.\n");
         }
     }
 
