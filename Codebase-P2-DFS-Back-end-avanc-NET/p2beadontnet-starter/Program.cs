@@ -2,9 +2,12 @@
 
 internal static class Program
 {
-    private static void Main()
+    private static void Main(string[] args)
     {
-        var repository = new CsvExpenseRepository("emma_expenses.csv");
+        string inputFile = args.Length > 0
+            ? args[0]
+            : "emma_expenses.csv";
+        var repository = new CsvExpenseRepository(inputFile);
         var application = new BudgetApplication(repository);
         application.Run();
     }
