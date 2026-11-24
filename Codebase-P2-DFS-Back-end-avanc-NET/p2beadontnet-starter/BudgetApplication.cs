@@ -230,16 +230,6 @@ public sealed class BudgetApplication
         Console.WriteLine("{0,-35}: {1,10:0.00} €", "Mensualités théoriques", theomonthlyPaiement);
         Console.WriteLine("{0,-35}: {1,10:0.00} €", "Mensualités retenues", validmonthlyPaiement);
 
-        /*if (mortgageRate == 0)
-        {
-            Console.WriteLine($"La capacité d'emprunt est de {validmonthlyPaiement * mortgageDuration * 12} €");
-        } else
-        {
-            decimal n = mortgageDuration * 12;
-            decimal r = mortgageRate / 100 / 12;
-            Console.WriteLine($"La capacité d'emprunt est de {validmonthlyPaiement * ( 1 - (decimal)Math.Pow((double)(1m + r), (double)(-n))) / r, 0:0.00} €");
-        }*/
-
         Console.WriteLine($"\nLa capacité d'emprunt est de {CalculateMorgageSimulation(validmonthlyPaiement, mortgageDuration, mortgageRate), 0:0.00} €");
 
     }

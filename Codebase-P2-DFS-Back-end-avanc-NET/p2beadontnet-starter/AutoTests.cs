@@ -128,11 +128,21 @@ public static class AutoTests
 
         
         // Test de la fonction CalculateCarPurchaseSimulation
-        if (BudgetApplication.CalculateCarPurchaseSimulation(emptylistExpenses, 2000, 20000) is not decimal)
-            Console.WriteLine($"Erreur Test CalculateCarPurchaseSimulation with oneExpenses, résultat : {BudgetApplication.CalculateCarPurchaseSimulation(emptylistExpenses, 2000, 20000)}");
+        if (BudgetApplication.CalculateCarPurchaseSimulation(emptylistExpenses, 2000, 20000) != null)
+            Console.WriteLine($"Erreur Test CalculateCarPurchaseSimulation with emptylistExpenses, résultat : {BudgetApplication.CalculateCarPurchaseSimulation(emptylistExpenses, 2000, 20000)}");
 
         if (BudgetApplication.CalculateCarPurchaseSimulation(oneExpenses, 2000, 20000) != 14m)
             Console.WriteLine($"Erreur Test CalculateCarPurchaseSimulation with oneExpenses, résultat : {BudgetApplication.CalculateCarPurchaseSimulation(oneExpenses, 2000, 20000)}");
+
+        if (BudgetApplication.CalculateCarPurchaseSimulation(notemptyExpenses, 2000, 20000) != 11m)
+            Console.WriteLine($"Erreur Test CalculateCarPurchaseSimulation with notemptyExpenses, résultat : {BudgetApplication.CalculateCarPurchaseSimulation(notemptyExpenses, 2000, 20000)}");
+
+
+        // Test de la fonction CalculateMorgageSimulation
+        if (Decimal.Round(BudgetApplication.CalculateMorgageSimulation(700, 20, 0), 2) != 168000.00m)
+            Console.WriteLine($"Erreur Test CalculateMorgageSimulation with r=0, résultat : {Decimal.Round(BudgetApplication.CalculateMorgageSimulation(700, 20, 0), 2)}");
+        if (Decimal.Round(BudgetApplication.CalculateMorgageSimulation(700, 20, 2), 2) != 138371.82m) 
+            Console.WriteLine($"Erreur Test CalculateMorgageSimulation with r!=0, résultat : {Decimal.Round(BudgetApplication.CalculateMorgageSimulation(700, 20, 2), 2)}");
     }
 
 }
